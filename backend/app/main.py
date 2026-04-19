@@ -5,13 +5,14 @@ from fastapi import FastAPI
 
 from backend.app.api.main import api_router
 from backend.app.core.config import settings
+from backend.app.core.logging import logger
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    print("performing initialization procedure")
+    logger.info("performing initialization procedure")
     yield
-    print("Shutting down, performing essential cleanup")
+    logger.info("Shutting down, performing essential cleanup")
 
 
 app = FastAPI(
