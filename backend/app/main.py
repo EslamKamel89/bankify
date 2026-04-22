@@ -1,18 +1,20 @@
 from contextlib import asynccontextmanager
 
-import fastapi_swagger_dark as fsd
 from fastapi import FastAPI
 
 from backend.app.api.main import api_router
 from backend.app.core.config import settings
+from backend.app.core.db import dispose_db, init_db
 from backend.app.core.logging import logger
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     logger.info("performing initialization procedure")
+    await init_db()
     yield
     logger.info("Shutting down, performing essential cleanup")
+    await dispose_db()
 
 
 app = FastAPI(
