@@ -13,3 +13,9 @@ services:
       - "./.envs/.env.local"
     volumes:
       - ./volumes/db/local:/var/lib/postgresql/data
+    networks:
+      - traefik
+
+networks:
+  traefik:
+    driver: bridge
