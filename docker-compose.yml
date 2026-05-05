@@ -76,6 +76,52 @@ services:
     networks:
       - traefik
 
+  redis:
+    image: redis:8.8-m03-trixie
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    networks:
+      - traefik
+
+  celery_worker:
+    build:
+      context: .
+      dockerfile: ./backend/docker/local/fastapi/Dockerfile
+    command: celery -A backend.app.core.celery_app worker --loglevel=info
+    depends_on:
+      - redis
+    env_file:
+      - ./.envs/.env.local
+    networks:
+      - traefik
+
+  flower:
+    build:
+      context: .
+      dockerfile: ./backend/docker/local/fastapi/Dockerfile
+    command: celery -A backend.app.core.celery_app flower --port=5555
+    ports:
+      - "5555:5555"
+    depends_on:
+      - redis
+    env_file:
+      - ./.envs/.env.local
+    networks:
+      - traefik
+
+  celery_beat:
+    build:
+      context: .
+      dockerfile: ./backend/docker/local/fastapi/Dockerfile
+    command: celery -A backend.app.core.celery_app beat --loglevel=info
+    depends_on:
+      - redis
+    env_file:
+      - ./.envs/.env.local
+    networks:
+      - traefik
+
 networks:
   traefik:
     driver: bridge

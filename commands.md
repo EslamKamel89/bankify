@@ -9,7 +9,7 @@ Starts all services using the base configuration and local overrides.
 docker compose \
   -f docker-compose.yml \
   -f docker-compose.local.yml \
-  up
+  up --build
 ````
 
 ---
