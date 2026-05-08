@@ -47,7 +47,7 @@ services:
       - "8025:8025"
       - "1025:1025"
     volumes:
-      - bankfiy_mailpit_data:/data
+      - bankify_mailpit_data:/data
     environment:
       - MP_MAX_MESSAGES=5000
       - MP_DATA_FILE=/data/mailpit.db
@@ -90,6 +90,7 @@ services:
       dockerfile: ./backend/docker/local/fastapi/Dockerfile
     command: celery -A backend.app.core.celery_app worker --loglevel=info
     depends_on:
+      - rabbitmq
       - redis
     env_file:
       - ./.envs/.env.local
@@ -104,6 +105,7 @@ services:
     ports:
       - "5555:5555"
     depends_on:
+      - rabbitmq
       - redis
     env_file:
       - ./.envs/.env.local
@@ -116,9 +118,23 @@ services:
       dockerfile: ./backend/docker/local/fastapi/Dockerfile
     command: celery -A backend.app.core.celery_app beat --loglevel=info
     depends_on:
+      - rabbitmq
       - redis
     env_file:
       - ./.envs/.env.local
+    networks:
+      - traefik
+  rabbitmq:
+    image: rabbitmq:3.13-management
+    restart: unless-stopped
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    # environment:
+    # RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
+    # RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
     networks:
       - traefik
 
@@ -127,4 +143,5 @@ networks:
     driver: bridge
 
 volumes:
-  bankfiy_mailpit_data:
+  bankify_mailpit_data:
+  rabbitmq_data:
