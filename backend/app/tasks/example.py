@@ -7,6 +7,6 @@ from backend.app.core.logging import logger
 @shared_task(name="tasks.add")
 def add(x: int, y: int) -> int:
     result = x + y
-    # print(result)
+    print(result)
     logger.info(f"Example task result is {result}")
     return result
